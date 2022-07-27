@@ -9,7 +9,7 @@ namespace Homework_7
             // Загрузка из файла
             // Инициализация базы данных
             // Инициализация пользовательского интерфейса
-            UserInterface ui = new UserInterface(FileDataBase.Load());
+            UserInterface ui = new UserInterface(FileRepository.Load());
 
             // Показать справку по командам
             ui.ShowHelp();

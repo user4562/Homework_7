@@ -8,7 +8,7 @@ namespace Homework_7
     /// некоторые функии для их обработки.
     /// Новая запись может быть создана только в базе данных
     /// </summary>
-    internal struct Employee
+    internal struct Worker
     {
         /// <summary>
         /// Id записи
@@ -56,7 +56,7 @@ namespace Homework_7
         /// <param name="height">Рост</param>
         /// <param name="dateOfBirth">Дата рождения</param>
         /// <param name="placeOfBirth">Место рождения</param>
-        private Employee(int id, DateTime dateAdded, string fullName, int age,
+        private Worker(int id, DateTime dateAdded, string fullName, int age,
                     int height, DateTime dateOfBirth, string placeOfBirth)
         {
             Id = id;
@@ -74,7 +74,7 @@ namespace Homework_7
         /// хранящейся в файле
         /// </summary>
         /// <param name="packItem">Упакованная строка из файла</param>
-        public Employee(string packItem)
+        public Worker(string packItem)
         {
             string[] data = packItem.Split('#');
 
@@ -148,10 +148,10 @@ namespace Homework_7
         /// <param name="dateOfBirth">Дата рождения</param>
         /// <param name="placeOfBirth">Место рождения</param>
         /// <returns>Возращяет Id только что созданной записи</returns>
-        public static int Create(ref DataBase context, string fullName, int age,
+        public static int Create(ref Repository context, string fullName, int age,
                     int height, DateTime dateOfBirth, string placeOfBirth)
         {
-            Employee newEmp = new Employee(context.GetFreeId(), DateTime.Now, fullName,
+            Worker newEmp = new Worker(context.GetFreeId(), DateTime.Now, fullName,
                                     age, height, dateOfBirth, placeOfBirth);
 
             context.Added(newEmp);

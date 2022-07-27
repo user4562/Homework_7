@@ -5,25 +5,25 @@ namespace Homework_7
     /// <summary>
     /// Структура базы данных, обрабатывает набор записей
     /// </summary>
-    internal struct DataBase
+    internal struct Repository
     {
         /// <summary>
         /// Набор записей, хранящихся в базе данных
         /// </summary>
-        public Employee[] Employees { get; private set; }
+        public Worker[] Employees { get; private set; }
 
         /// <summary>
         /// Конструктор инициализирующий структуру базы
         /// из упакованных строк хранящихся в файле
         /// </summary>
         /// <param name="packItems">Массив строк из файла</param>
-        public DataBase(string[] packItems)
+        public Repository(string[] packItems)
         {
-            Employees = new Employee[packItems.Length];
+            Employees = new Worker[packItems.Length];
 
             for (int i = 0; i < Count; i++)
             {
-                Employees[i] = new Employee(packItems[i]);
+                Employees[i] = new Worker(packItems[i]);
             }
         }
 
@@ -31,7 +31,7 @@ namespace Homework_7
         /// Конструктор инициализирющий базу из массива записей
         /// </summary>
         /// <param name="employees">Массив записей</param>
-        public DataBase(Employee[] employees)
+        public Repository(Worker[] employees)
         {
             Employees = employees;
         }
@@ -68,7 +68,7 @@ namespace Homework_7
         /// </summary>
         /// <param name="id">Id записи</param>
         /// <returns>Запись с указаным id</returns>
-        public Employee ItemOfId(int id)
+        public Worker ItemOfId(int id)
         {
             return Employees[IndexOfId(id)];
         }
@@ -100,9 +100,9 @@ namespace Homework_7
         /// Добавляет запись в базу
         /// </summary>
         /// <param name="newItem">Новая запись</param>
-        public void Added(Employee newItem)
+        public void Added(Worker newItem)
         {
-            Employee[] newEmp = new Employee[Employees.Length + 1];
+            Worker[] newEmp = new Worker[Employees.Length + 1];
 
             if (newEmp.Length == 1)
             {
@@ -115,7 +115,7 @@ namespace Homework_7
             }
 
             Employees = newEmp;
-            FileDataBase.Save(ref this);
+            FileRepository.Save(ref this);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Homework_7
         /// <param name="id">Id записи которую нужно удалить</param>
         public void Delete(int id)
         {
-            Employee[] newEmp = new Employee[Count - 1];
+            Worker[] newEmp = new Worker[Count - 1];
 
             for (int i = 0, j = 0; i < Count; i++)
             {
@@ -136,7 +136,7 @@ namespace Homework_7
             }
 
             Employees = newEmp;
-            FileDataBase.Save(ref this);
+            FileRepository.Save(ref this);
         }
 
         /// <summary>
@@ -145,10 +145,10 @@ namespace Homework_7
         /// <param name="up">Направление сортировки</param>
         /// <param name="save">Сохранять или нет в файл</param>
         /// <returns>Возвращяет отсортированные записи</returns>
-        public Employee[] Sort(bool up, bool save)
+        public Worker[] Sort(bool up, bool save)
         {
-            Employee[] newEmp = Employees;
-            Employee temp;
+            Worker[] newEmp = Employees;
+            Worker temp;
 
             for (int i = 0; i < Count - 1; i++)         // Сортирует
             {
@@ -167,7 +167,7 @@ namespace Homework_7
             if (save)                                   // Созранение в файл
             {
                 Employees = newEmp;
-                FileDataBase.Save(ref this);
+                FileRepository.Save(ref this);
             }
 
             return newEmp;
@@ -179,9 +179,9 @@ namespace Homework_7
         /// <param name="from">Дата с которой нужно начать поиск</param>
         /// <param name="to">Дата до которой нужно вести поиск</param>
         /// <returns>Записи удовлетворяющие поиску</returns>
-        public Employee[] FindByDates(DateTime from, DateTime to)
+        public Worker[] FindByDates(DateTime from, DateTime to)
         {
-            Employee[] newEmp = new Employee[Count];
+            Worker[] newEmp = new Worker[Count];
 
             if (from > to)                              // Если дата начала больше даты конца поиска
             {                                           // функция меняет их местами

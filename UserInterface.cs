@@ -11,7 +11,7 @@ namespace Homework_7
         /// <summary>
         /// База данных которую будет обробатывать этот пользовательский интерфейс
         /// </summary>
-        private DataBase context;
+        private Repository context;
 
         /// <summary>
         /// Константы имен команд 
@@ -47,7 +47,7 @@ namespace Homework_7
         /// к которой и будет применен этот пользовательский интерфейс
         /// </summary>
         /// <param name="context"></param>
-        public UserInterface(DataBase context)
+        public UserInterface(Repository context)
         {
             this.context = context;
 
@@ -266,7 +266,7 @@ namespace Homework_7
                 }
             }
 
-            Employee[] employees = context.FindByDates(from, to);
+            Worker[] employees = context.FindByDates(from, to);
 
             if (employees.Length == 0)
             {
@@ -431,7 +431,7 @@ namespace Homework_7
 
             }
 
-            int id = Employee.Create(ref context, fullName, age, height, dateOfBirth, placeOfBirth);
+            int id = Worker.Create(ref context, fullName, age, height, dateOfBirth, placeOfBirth);
 
             Console.WriteLine();
             Console.WriteLine($"Новая запись c id {id} создана.");
@@ -520,7 +520,7 @@ namespace Homework_7
         /// Показывает по одному все записи в массиве записей
         /// </summary>
         /// <param name="items">Массив записей</param>
-        private void ShowItems(Employee[] items)
+        private void ShowItems(Worker[] items)
         {
             for (int i = 0; i < items.Length; i++)
             {

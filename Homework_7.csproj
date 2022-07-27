@@ -43,9 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataBase.cs" />
-    <Compile Include="Employee.cs" />
-    <Compile Include="FileDataBase.cs" />
+    <Compile Include="Repository.cs" />
+    <Compile Include="Worker.cs" />
+    <Compile Include="FileRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterface.cs" />

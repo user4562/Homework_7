@@ -6,7 +6,7 @@ namespace Homework_7
     /// <summary>
     /// Структура со статичесикми методами для комуникации с файлом базы данных
     /// </summary>
-    internal struct FileDataBase
+    internal struct FileRepository
     {
         /// <summary>
         /// Путь к базе данных
@@ -17,7 +17,7 @@ namespace Homework_7
         /// Метод загрузки базы данных из файла
         /// </summary>
         /// <returns>Возвращяет структуру базы данных</returns>
-        public static DataBase Load()
+        public static Repository Load()
         {
             Check();
             int countItems = 0;
@@ -33,18 +33,18 @@ namespace Homework_7
 
             Array.Resize(ref items, countItems);
 
-            return new DataBase(items);
+            return new Repository(items);
         }
 
         /// <summary>
         /// Метод сохранения базы данных в файл
         /// </summary>
         /// <param name="dataBase">Структура базы данных</param>
-        public static void Save(ref DataBase dataBase)
+        public static void Save(ref Repository dataBase)
         {
             using (StreamWriter sw = new StreamWriter(FilePath))
             {
-                foreach (Employee emplo in dataBase.Employees)
+                foreach (Worker emplo in dataBase.Employees)
                     sw.WriteLine(emplo.ToPackString());
             }
         }
