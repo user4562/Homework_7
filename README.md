@@ -16,7 +16,7 @@ FileRepository	- комуницирует с файлом: загружает, �
 
 
 	
-		UserInterface <-- DataBase <--> FileDataBase
+		UserInterface <-- Repository <--> FileRepository
 				     ^
 			             |
-			          Employee	
+			           Worker	
