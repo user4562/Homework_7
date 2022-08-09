@@ -151,11 +151,11 @@ namespace Homework_7
         public static int Create(ref Repository context, string fullName, int age,
                     int height, DateTime dateOfBirth, string placeOfBirth)
         {
-            Worker newEmp = new Worker(context.GetFreeId(), DateTime.Now, fullName,
+            Worker newEmployee = new Worker(context.GetFreeId(), DateTime.Now, fullName,
                                     age, height, dateOfBirth, placeOfBirth);
 
-            context.Added(newEmp);
-            return newEmp.Id;
+            context.Add(newEmployee);
+            return newEmployee.Id;
         }
     }
 }

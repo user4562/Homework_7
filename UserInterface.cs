@@ -6,7 +6,7 @@ namespace Homework_7
     /// <summary>
     /// Структура реализующяя пользовательскй интерфейс 
     /// </summary>
-    internal struct UserInterface
+    internal class UserInterface
     {
         /// <summary>
         /// База данных которую будет обробатывать этот пользовательский интерфейс
@@ -166,7 +166,7 @@ namespace Homework_7
 
             for (int i = 0; i < context.Count; i++)
             {
-                Console.WriteLine(context.Employees[i].ToShowString());
+                Console.WriteLine(context[i].ToShowString());
                 Console.WriteLine();
             }
         }
@@ -266,7 +266,7 @@ namespace Homework_7
                 }
             }
 
-            Worker[] employees = context.FindByDates(from, to);
+            Worker[] employees = context.FindByDates(from, to).ToArray();
 
             if (employees.Length == 0)
             {
@@ -296,7 +296,7 @@ namespace Homework_7
             DelNameCommand(ref itemId, delCommand);
             if (!GetId(itemId, out id)) return;
 
-            context.Delete(id);
+            context.Remove(id);
 
             Console.WriteLine("Элемент удален.");
             Console.WriteLine();
@@ -340,7 +340,7 @@ namespace Homework_7
             }
 
             ShowCount();
-            ShowItems(context.Sort(trend, save));
+            ShowItems(context.Sort(trend, save).ToArray());
         }
 
         /// <summary>
@@ -447,12 +447,12 @@ namespace Homework_7
         /// <param name="itemId">id записи которую нужно изменить</param>
         public void EditItem(string itemId)
         {
-            int id;
-
             DelNameCommand(ref itemId, editCommand);
+
+            int id;
             if (!GetId(itemId, out id)) return;                             // Получение id из строки ввода
 
-            int index = context.IndexOfId(id);                              // Находит запись по id для изменения
+            Worker newWorker = context.ItemOfId(id);                              // Находит запись по id для изменения
 
             string fullName;                                                // Если пользователь не ввел значения
             int age;                                                        // параметру то ему будет присвоенно
@@ -462,41 +462,41 @@ namespace Homework_7
                                                                             // string (null), int (-1),
             string temp;                                                    // DateTime (DateTime.MinValue)
 
-            Console.Write($"({context.Employees[index].FullName}) Ф.И.О.: ");                // Получение полного имени
+            Console.Write($"({newWorker.FullName}) Ф.И.О.: ");                // Получение полного имени
             fullName = Console.ReadLine();
             if (string.IsNullOrEmpty(fullName))
                 fullName = null;
 
-            Console.Write($"({context.Employees[index].Age}) Возраст: ");                    // Получение возраста
+            Console.Write($"({newWorker.Age}) Возраст: ");                    // Получение возраста
             temp = Console.ReadLine();
             if (string.IsNullOrEmpty(temp))
                 age = -1;
             else if (!int.TryParse(temp, out age))
                 age = -1;
 
-            Console.Write($"({context.Employees[index].Height}) Рост: ");                    // Получение роста
+            Console.Write($"({newWorker.Height}) Рост: ");                    // Получение роста
             temp = Console.ReadLine();
             if (string.IsNullOrEmpty(temp))
                 height = -1;
             else if (!int.TryParse(temp, out height))
                 height = -1;
 
-            Console.Write($"({context.Employees[index].DateOfBirth}) Дата рождения: ");      // Получение даты рождения
+            Console.Write($"({newWorker.DateOfBirth}) Дата рождения: ");      // Получение даты рождения
             temp = Console.ReadLine();
             if (string.IsNullOrEmpty(temp))
                 dateOfBirth = DateTime.MinValue;
             else if (!DateTime.TryParse(temp, out dateOfBirth))
                 dateOfBirth = DateTime.MinValue;
 
-            Console.Write($"({context.Employees[index].PlaceOfBirth}) Место рождения: ");    // Получение места рождения
+            Console.Write($"({newWorker.PlaceOfBirth}) Место рождения: ");    // Получение места рождения
             placeOfBirth = Console.ReadLine();
             if (string.IsNullOrEmpty(placeOfBirth))
                 placeOfBirth = null;
 
             Console.WriteLine();
 
-            context.Employees[index].Edit(fullName, age, height, dateOfBirth, placeOfBirth);
-
+            newWorker.Edit(fullName, age, height, dateOfBirth, placeOfBirth);
+            context.Edit(newWorker);
 
             Console.WriteLine($"Запись с id {id} изменена.");
             Console.WriteLine();
@@ -569,7 +569,7 @@ namespace Homework_7
                     return false;
                 }
 
-                else if (!context.ExistItem(id))                // Проверка есть ли запись с таким id в базе
+                else if (!context.IsExist(id))                // Проверка есть ли запись с таким id в базе
                 {
                     ErrorMessage(errorIdExsistMessage);
                     return false;

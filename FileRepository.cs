@@ -1,61 +1,44 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Collections.Generic;
 
 namespace Homework_7
 {
     /// <summary>
-    /// Структура со статичесикми методами для комуникации с файлом базы данных
+    /// Статический класс комуникации с файлом базы данных
     /// </summary>
-    internal struct FileRepository
+    internal static class FileRepository
     {
-        /// <summary>
-        /// Путь к базе данных
-        /// </summary>
-        private static string FilePath = "DataBase.txt";
-
         /// <summary>
         /// Метод загрузки базы данных из файла
         /// </summary>
-        /// <returns>Возвращяет структуру базы данных</returns>
-        public static Repository Load()
+        /// <returns>Возвращяет класс базы данных</returns>
+        public static Repository Load(string path)
         {
-            Check();
-            int countItems = 0;
-            string[] lines = File.ReadAllLines(FilePath);
-            string[] items = new string[lines.Length];
+            if (File.Exists(path)) return new Repository(new List<string>(), path);
 
-            for (int i = 0; i < lines.Length; i++)                  // Удаление всех пустых строк
+            string[] lines = File.ReadAllLines(path);
+            List<string> items = new List<string>(lines.Length);
+
+            foreach(string line in lines)                  // Удаление всех пустых строк
             {
-                if (lines[i].Trim() == string.Empty) continue;
-                items[countItems] = lines[i];
-                countItems++;
+                if (line.Trim() == string.Empty) continue;
+                items.Add(line);
             }
 
-            Array.Resize(ref items, countItems);
-
-            return new Repository(items);
+            return new Repository(items, path);
         }
 
         /// <summary>
         /// Метод сохранения базы данных в файл
         /// </summary>
-        /// <param name="dataBase">Структура базы данных</param>
-        public static void Save(ref Repository dataBase)
+        /// <param name="dataBase">Класс базы данных</param>
+        public static void Save(Repository dataBase)
         {
-            using (StreamWriter sw = new StreamWriter(FilePath))
+            using (StreamWriter sw = new StreamWriter(dataBase.Path))
             {
-                foreach (Worker emplo in dataBase.Employees)
+                foreach (Worker emplo in dataBase.ToArray())
                     sw.WriteLine(emplo.ToPackString());
             }
-        }
-
-
-        /// <summary>
-        /// Проверяет существует для файл, если нет - создает его
-        /// </summary>
-        private static void Check()
-        {
-            if (!File.Exists(FilePath)) File.Create(FilePath).Close();
         }
     }
 }

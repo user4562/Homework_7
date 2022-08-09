@@ -1,63 +1,72 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Homework_7
 {
     /// <summary>
-    /// Структура базы данных, обрабатывает набор записей
+    /// Класс базы данных, обрабатывает набор записей
     /// </summary>
-    internal struct Repository
+    internal class Repository
     {
-        /// <summary>
-        /// Набор записей, хранящихся в базе данных
-        /// </summary>
-        public Worker[] Employees { get; private set; }
-
         /// <summary>
         /// Конструктор инициализирующий структуру базы
         /// из упакованных строк хранящихся в файле
         /// </summary>
         /// <param name="packItems">Массив строк из файла</param>
-        public Repository(string[] packItems)
+        public Repository(List<string> packItems, string path)
         {
-            Employees = new Worker[packItems.Length];
-
-            for (int i = 0; i < Count; i++)
-            {
-                Employees[i] = new Worker(packItems[i]);
-            }
+            employees = packItems.ConvertAll<Worker>(n => new Worker(n));
+  
+            Path = path;
         }
 
         /// <summary>
         /// Конструктор инициализирющий базу из массива записей
         /// </summary>
         /// <param name="employees">Массив записей</param>
-        public Repository(Worker[] employees)
+        public Repository(Worker[] employees, string path)
         {
-            Employees = employees;
+            this.employees = new List<Worker>(employees);
+
+            Path = path;
         }
+
+        /// <summary>
+        /// Набор записей, хранящихся в базе данных
+        /// </summary>
+        private List<Worker> employees;
+
+        public readonly string Path;
+
+
+        public Worker this[int index] => employees[index];
+
+
+        /// <summary>
+        /// Копирует элементы Worker в новый массив 
+        /// </summary>
+        /// <returns>Массив Worker</returns>
+        public Worker[] ToArray() => employees.ToArray();
 
         /// <summary>
         /// Количество записей в базе
         /// </summary>
-        public int Count
-        {
-            get { return Employees.Length; }
-        }
+        public int Count => employees.Count;
 
         /// <summary>
-        /// Возвращяет ближайший не занятый id 
+        /// Возвращяет ближайший не занятый от нуля id 
         /// </summary>
-        /// <returns>Ближайший не занятый id</returns>
+        /// <returns>Ближайший не занятый от нуля id</returns>
         public int GetFreeId()
         {
             int[] ids = new int[Count];
 
             for (int i = 0; i < Count; i++)     // Берет все id в базе
-                ids[i] = Employees[i].Id;
+                ids[i] = employees[i].Id;
 
-            Array.Sort(ids);                    // сортирует их по возрастанию
+            Array.Sort(ids);                  
 
-            for (int i = 0; i < Count; i++)     // увеличивает счетчик на 1 и и возвращяет тот
+            for (int i = 0; i < Count; i++)     // увеличивает счетчик на 1 и возвращяет тот
                 if (ids[i] != i) return i;      // который не совпадает со счетчиком
 
             return Count;
@@ -70,7 +79,7 @@ namespace Homework_7
         /// <returns>Запись с указаным id</returns>
         public Worker ItemOfId(int id)
         {
-            return Employees[IndexOfId(id)];
+            return employees[IndexOfId(id)];
         }
 
         /// <summary>
@@ -78,10 +87,10 @@ namespace Homework_7
         /// </summary>
         /// <param name="id">Id записи</param>
         /// <returns>Индекс записи</returns>
-        public int IndexOfId(int id)
+        private int IndexOfId(int id)
         {
             for (int i = 0; i < Count; i++)
-                if (Employees[i].Id == id) return i;
+                if (employees[i].Id == id) return i;
 
             return -1;
         }
@@ -91,7 +100,7 @@ namespace Homework_7
         /// </summary>
         /// <param name="id">Id записи</param>
         /// <returns>true - существует, false - не существует</returns>
-        public bool ExistItem(int id)
+        public bool IsExist(int id)
         {
             return IndexOfId(id) != -1;
         }
@@ -100,43 +109,33 @@ namespace Homework_7
         /// Добавляет запись в базу
         /// </summary>
         /// <param name="newItem">Новая запись</param>
-        public void Added(Worker newItem)
+        public void Add(Worker worker)
         {
-            Worker[] newEmp = new Worker[Employees.Length + 1];
+            employees.Add(worker);
 
-            if (newEmp.Length == 1)
-            {
-                newEmp[0] = newItem;
-            }
-            else
-            {
-                Employees.CopyTo(newEmp, 0);
-                newEmp[Employees.Length] = newItem;
-            }
-
-            Employees = newEmp;
-            FileRepository.Save(ref this);
+            Save();
         }
 
         /// <summary>
         /// Удаляет запись из базы
         /// </summary>
         /// <param name="id">Id записи которую нужно удалить</param>
-        public void Delete(int id)
+        public void Remove(int id)
         {
-            Worker[] newEmp = new Worker[Count - 1];
+            employees.RemoveAt(IndexOfId(id));
+            Save();
+        }
 
-            for (int i = 0, j = 0; i < Count; i++)
+        public void Edit(Worker worker)
+        {
+            if(IsExist(worker.Id))
             {
-                if (Employees[i].Id != id)
-                {
-                    newEmp[j] = Employees[i];
-                    j++;
-                }
+                employees[IndexOfId(worker.Id)] = worker;
             }
-
-            Employees = newEmp;
-            FileRepository.Save(ref this);
+            else
+            {
+                Add(worker);
+            }
         }
 
         /// <summary>
@@ -145,32 +144,28 @@ namespace Homework_7
         /// <param name="up">Направление сортировки</param>
         /// <param name="save">Сохранять или нет в файл</param>
         /// <returns>Возвращяет отсортированные записи</returns>
-        public Worker[] Sort(bool up, bool save)
+        public List<Worker> Sort(bool up, bool save)
         {
-            Worker[] newEmp = Employees;
-            Worker temp;
+            List<Worker> newEmployees = employees;
 
-            for (int i = 0; i < Count - 1; i++)         // Сортирует
+            newEmployees.Sort(delegate(Worker w1, Worker w2) 
             {
-                for (int j = i + 1; j < Count; j++)
-                {
-                    if (newEmp[i].DateAdded > newEmp[j].DateAdded)
-                    {
-                        temp = newEmp[i];
-                        newEmp[i] = newEmp[j];
-                        newEmp[j] = temp;
-                    }
-                }
-            }
+                if (w1.DateAdded < w2.DateAdded) return -1;
+                if (w1.DateAdded > w2.DateAdded) return 1;
+                return 0;
+            });
 
-            if (!up) Array.Reverse(Employees);          // Если направление сортировки обратное то разворачевает найденое
+            if (!up)
+            {
+                newEmployees.Reverse();                 // Если направление сортировки обратное то разворачевает найденое
+            }
             if (save)                                   // Созранение в файл
             {
-                Employees = newEmp;
-                FileRepository.Save(ref this);
+                employees = newEmployees;
+                Save();
             }
 
-            return newEmp;
+            return newEmployees;
         }
 
         /// <summary>
@@ -179,9 +174,9 @@ namespace Homework_7
         /// <param name="from">Дата с которой нужно начать поиск</param>
         /// <param name="to">Дата до которой нужно вести поиск</param>
         /// <returns>Записи удовлетворяющие поиску</returns>
-        public Worker[] FindByDates(DateTime from, DateTime to)
+        public List<Worker> FindByDates(DateTime from, DateTime to)
         {
-            Worker[] newEmp = new Worker[Count];
+            List<Worker> newEmployees = new List<Worker>(Count);
 
             if (from > to)                              // Если дата начала больше даты конца поиска
             {                                           // функция меняет их местами
@@ -190,21 +185,21 @@ namespace Homework_7
                 to = temp;
             }
 
-            int count = 0;
-            for (int i = 0; i < Count; i++)             // Ищет удовлетворяющие датам
+            newEmployees = employees.FindAll(delegate (Worker worker)
             {
-                if (Employees[i].DateAdded > from && Employees[i].DateAdded < to)
-                {
-                    newEmp[count] = Employees[i];
-                    count++;
-                }
-            }
+                return worker.DateAdded > from && worker.DateAdded < to;
+            });
 
-            Array.Resize(ref newEmp, count);
-
-            return newEmp;
+            return newEmployees;
         }
 
+        /// <summary>
+        /// Сохраняет
+        /// </summary>
+        private void Save()
+        {
+            FileRepository.Save(this);
+        }
     }
 }
 
